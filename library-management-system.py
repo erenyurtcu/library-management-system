@@ -12,9 +12,13 @@ class Library:
             print("No books available.")
             return
         print("*** List of Books ***")
+        book_number = 1
         for book in books:
             title, author, release_year, pages = book.strip().split(",")
-            print(f"Title: {title}, Author: {author}")
+            print(f"Book {book_number}\nTitle: {title}, Author: {author} \nYear: {release_year}, {pages} Pages")
+            book_number += 1
+            if book_number <= len(books):  # Print separator for all books except the last one
+                print("------------")
 
     def add_book(self):
         title = input("Enter the title of the book: ")
@@ -46,7 +50,7 @@ class Library:
 
 
 # Create Library object
-lib = Library()
+library = Library()
 
 # Menu
 while True:
@@ -59,11 +63,11 @@ while True:
     choice = input("Enter your choice: ")
 
     if choice == '1':
-        lib.list_books()
+        library.list_books()
     elif choice == '2':
-        lib.add_book()
+        library.add_book()
     elif choice == '3':
-        lib.remove_book()
+        library.remove_book()
     elif choice == '4':
         break
     else:
