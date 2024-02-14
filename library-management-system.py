@@ -14,61 +14,90 @@ class Library:
         print("*** List of Books ***")
         book_number = 1
         for book in books:
-            title, author, release_year, pages = book.strip().split(",")
-            print(f"Book {book_number}\nTitle: {title}, Author: {author} \nYear: {release_year}, {pages} Pages")
+            book_data = book.strip().split(",")
+            if len(book_data) < 5:  # Ensure the book has at least 5 values
+                print("Error: Invalid book data format.")
+                continue
+            book_id, title, author, release_year, pages = book_data[:5]
+            print(f"Book {book_number}\n-------\nID: {book_id}\nTitle: {title}, Author: {author} \nYear: {release_year}, {pages} Pages")
             book_number += 1
             if book_number <= len(books):  # Print separator for all books except the last one
-                print("------------")
+                print("------------------------------------")
+
+
 
     def add_book(self):
+        book_id = input("Enter the ID of the book: ")
+        
+        # Check if the entered book_id already exists
+        if self.check_id_existence(book_id):
+            print("Book ID already exists. Please choose a different ID.")
+            return
+
         title = input("Enter the title of the book: ")
         author = input("Enter the author of the book: ")
         release_year = input("Enter the release year of the book: ")
         pages = input("Enter the number of pages: ")
-        book_info = f"{title},{author},{release_year},{pages}\n"
+        book_info = f"{book_id},{title},{author},{release_year},{pages}\n"
         self.file.write(book_info)
-        print("Book added successfully.")
+        print(f"Book '{title}' added successfully.")
+
+    def check_id_existence(self, book_id):
+        self.file.seek(0)
+        books = self.file.readlines()
+        for book in books:
+            if book.startswith(book_id + ','):
+                return True
+        return False
+
 
     def remove_book(self):
-        title = input("Enter the title of the book to remove: ")
+        remove_id = input("Enter the ID of the book to remove: ")
+        remove_title = input("Enter the title of the book to remove: ")
+
         self.file.seek(0)
         books = self.file.readlines()
         updated_books = []
         removed = False
         for book in books:
-            if title not in book:
-                updated_books.append(book)
-            else:
+            book_data = book.strip().split(",")
+            book_id, title, author, release_year, pages = book_data[:5]
+            if book_id == remove_id and title == remove_title:
                 removed = True
+                removed_title = title  # Store the title of the removed book for use in the print section
+            else:
+                updated_books.append(book)
         if not removed:
             print("Book not found.")
             return
         self.file.seek(0)
         self.file.truncate()
         self.file.writelines(updated_books)
-        print("Book removed successfully.")
+        print(f"Book '{removed_title}' removed successfully.")
+
+
 
 
 # Create Library object
 library = Library()
 
-# Menu
+# Menu Section
 while True:
     print("\n*** MENU ***")
-    print("1) List Books")
-    print("2) Add Book")
-    print("3) Remove Book")
-    print("4) Exit")
+    print("1) List Books ---> list")
+    print("2) Add Book ---> add")
+    print("3) Remove Book ---> remove")
+    print("4) Exit ---> exit")
 
-    choice = input("Enter your choice: ")
+    choice = input("Enter your command: ")
 
-    if choice == '1':
+    if choice.lower() == 'list':
         library.list_books()
-    elif choice == '2':
+    elif choice.lower() == 'add':
         library.add_book()
-    elif choice == '3':
+    elif choice.lower() == 'remove':
         library.remove_book()
-    elif choice == '4':
+    elif choice.lower() == 'exit':
         break
     else:
-        print("Invalid choice. Please choose from 1 to 4.")
+        print("Invalid command. Please type valid command.")
